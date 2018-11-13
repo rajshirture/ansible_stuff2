@@ -1,0 +1,13 @@
+- hosts: localhost
+  connection: local
+  vars:
+    group: table10rswebapprg
+    webapp_name: table10rswebapp
+    location: centralindia
+  tasks:
+    - name: Delete rg
+      azure_rm_resourcegroup:
+        name: "{{group}}"
+        location: "{{location}}"
+        state: absent
+        force: true

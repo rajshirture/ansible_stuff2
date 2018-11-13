@@ -1,0 +1,7 @@
+prefix: table10rs
+group_name: "{{prefix}}vmrg"
+vnet: "{{prefix}}vnet"
+nsg_name: "{{prefix}}secgroup"
+subnet_name: "{{prefix}}subnet"
+nic_name: "{{prefix}}nic"
+
