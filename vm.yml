@@ -1,41 +1,29 @@
 - name: Create  VM
   hosts: localhost
   connection: local
-  vars:
-    group_name: table10rsvmrg
-    vnet: table10rsvnet
-    nsg_name: table10rsvmsgroup
-    subnet_name: table10rsvmsubnet
-    nic_name: table10rsvnet 
+  vars_files:
+    - vars.yml
+    
   tasks:
   - name: Create resource group
     azure_rm_resourcegroup:
-      name: "{{ group_name}}"
-      location: centralindia
+      name: "{{ group_name }}"
+      location: southcentralus
   - name: Create virtual network
     azure_rm_virtualnetwork:
-      resource_group: "{{ group_name}}"
-      name: "{{ vnet}}"
+      resource_group: "{{ group_name }}"
+      name: "{{vnet}}"
       address_prefixes: "10.0.0.0/16"
   - name: Add subnet
     azure_rm_subnet:
-      resource_group: "{{ group_name}}"
-      name: "{{ subnet_name}}"
+      resource_group: "{{ group_name }}"
+      name: "{{subnet_name}}"
       address_prefix: "10.0.1.0/24"
-      virtual_network: "{{ vnet}}"
-  - name: Create public IP address
-    azure_rm_publicipaddress:
-      resource_group: "{{ group_name}}"
-      allocation_method: Static
-      name: table10rsvmrgip
-    register: output_ip_address
-  - name: Output public IP 
-    debug:
-      msg: "Public IP is {{ output_ip_address.state.ip_address }}."
+      virtual_network: "{{vnet}}"
   - name: Create Network Security Group that allows SSH
     azure_rm_securitygroup:
-      resource_group: "{{ group_name}}"
-      name: "{{ nsg_name}}"
+      resource_group: "{{ group_name }}"
+      name: "{{ nsg_name }}"
       rules:
         - name: SSH
           protocol: Tcp
@@ -43,33 +31,10 @@
           access: Allow
           priority: 1001
           direction: Inbound
-  - name: Create virtual network inteface card
-    azure_rm_networkinterface:
-      resource_group: "{{ group_name}}"
-      name: "{{ nic_name}}"
-      virtual_network: "{{ vnet}}"
-      subnet: "{{ subnet_name}}"
-      public_ip_name: table10rsvmrgIP
-      security_group: "{{ nsg_name}}"
-  - name: Create VM
-    azure_rm_virtualmachine:
-      resource_group: "{{ group_name}}"
-      name: table10rsVM
-      vm_size: Standard_DS1_v2
-      admin_username: azureops
-      ssh_password_enabled: false
-      ssh_public_keys:
-        - path: /home/azureops/.ssh/authorized_keys
-          key_data: | 
-            {{ lookup('file','/home/azureops/.ssh/id_rsa.pub') }}
-      network_interfaces: table10rsvmnic
-      image:
-        offer: UbuntuServer
-        publisher: Canonical
-        sku: '16.04-LTS'
-        version: latest
-# - name: Install Apache
- #  apt:
-  #   pkg: apache2
-   #  state: present
-    # update_cache: true
+  - include_tasks: vm_details.yml
+    loop: 
+      - { name: 'one', tag: 'nginx' }
+      - { name: 'two', tag: 'apache' }
+    loop_control:
+      loop_var: vm
+
