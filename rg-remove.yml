@@ -4,7 +4,7 @@
   tasks:
     - name: Create a resource 
       azure_rm_resourcegroup:
-        name: table10rsansibletest
-        location: centralindia
+        name: table10rsvmrg 
+        location: southcentralus
         state: absent
         force: true
