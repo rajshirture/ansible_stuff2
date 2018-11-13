@@ -2,9 +2,13 @@
   tasks:
     - name: Installs apache web server
       apt:
-        pkg: apache2
-        state: present
+        pkg: "{{item}}"
+        state: latest
         update_cache: true
+      with_items:
+       - apache2
+       - libapache2-mod-php
+       - git
       become: true 
 
     - name: Push default virtual host configuration
