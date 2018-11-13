@@ -1,4 +1,4 @@
-prefix: table10rs
+prefix: table10rs_
 group_name: "{{prefix}}vmrg"
 vnet: "{{prefix}}vnet"
 nsg_name: "{{prefix}}secgroup"
